@@ -45,10 +45,11 @@ def health():
 
 @app.route("/predict", methods=["POST"])
 def predict():
-    if "image" not in request.files:
-        return jsonify({"error": "No image file provided. Use form field 'image'."}), 400
+    # Frontend (diseaseService.js) sends the image under the key 'file'
+    if "file" not in request.files:
+        return jsonify({"error": "No image file provided. Use form field 'file'."}), 400
 
-    file = request.files["image"]
+    file = request.files["file"]
     image_bytes = file.read()
 
     try:
@@ -63,8 +64,9 @@ def predict():
     predicted_idx = int(np.argmax(output_data))
     confidence = float(output_data[predicted_idx])
 
+    # Frontend (diseaseService.js) reads `predicted_class` and `confidence`
     result = {
-        "class": CLASS_NAMES[predicted_idx],
+        "predicted_class": CLASS_NAMES[predicted_idx],
         "confidence": round(confidence, 4),
         "top_3": [
             {"class": CLASS_NAMES[i], "confidence": round(float(output_data[i]), 4)}
