@@ -33,7 +33,10 @@ with open(LABELS_PATH, "r") as f:
 def preprocess_image(image_bytes):
     img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
     img = img.resize((IMG_SIZE, IMG_SIZE))
-    arr = np.array(img, dtype=np.float32) / 255.0
+    # IMPORTANT: do NOT divide by 255 here. EfficientNetB0's preprocessing
+    # is baked into the model itself (confirmed in the training notebook,
+    # cell 13) — it expects raw [0, 255] float32 values, not [0, 1].
+    arr = np.array(img, dtype=np.float32)
     arr = np.expand_dims(arr, axis=0)
     return arr
 
